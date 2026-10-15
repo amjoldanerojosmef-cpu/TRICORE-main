@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Request computer, printer, networking, website, and IT services from Tricore Digital Works."
+    />
+    <title>Request a Service | Tricore Digital Works</title>
+    <link rel="stylesheet" href="indexStyle.css" />
+    <script src="service-request.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <nav class="navbar">
+        <h2>TRICORE DIGITAL WORKS</h2>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="services.html" class="active">Services</a></li>
+          <li><a href="products.html">Products</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="signin.html">Sign In</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="request-main">
+      <a class="request-back-link" href="services.html"
+        >&larr; Back to Services</a
+      >
+
+      <section class="request-intro">
+        <p class="eyebrow">TRICORE DIGITAL WORKS</p>
+        <h1>Request a <span>Service</span></h1>
+        <p>
+          Tell us what you need, and our team will review the details and help
+          you find the right solution.
+        </p>
+      </section>
+
+      <div class="request-notice" role="note">
+        <strong>Online submission is not connected yet.</strong>
+        You can complete and validate this form, but your information will not
+        be sent or saved until a submission service is configured.
+      </div>
+
+      <form id="service-request-form" class="request-form" method="post">
+        <p class="request-required-note">
+          Fields marked <span aria-hidden="true">*</span> are required.
+        </p>
+
+        <section class="request-section" aria-labelledby="customer-heading">
+          <div class="request-section-heading">
+            <span class="request-section-number">01</span>
+            <h2 id="customer-heading">Customer Information</h2>
+          </div>
+
+          <div class="request-field-grid">
+            <div class="request-field">
+              <label for="full-name"
+                >Full Name <span aria-hidden="true">*</span></label
+              >
+              <input
+                type="text"
+                id="full-name"
+                name="fullName"
+                autocomplete="name"
+                placeholder="e.g. Alex Santos"
+                required
+              />
+            </div>
+
+            <div class="request-field">
+              <label for="contact-number"
+                >Contact Number <span aria-hidden="true">*</span></label
+              >
+              <input
+                type="tel"
+                id="contact-number"
+                name="contactNumber"
+                autocomplete="tel"
+                inputmode="tel"
+                placeholder="e.g. +63 912 345 6789"
+                required
+              />
+            </div>
+
+            <div class="request-field">
+              <label for="email"
+                >Email Address
+                <span class="request-optional">Optional</span></label
+              >
+              <input
+                type="email"
+                id="email"
+                name="email"
+                autocomplete="email"
+                placeholder="you@example.com"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section class="request-section" aria-labelledby="service-heading">
+          <div class="request-section-heading">
+            <span class="request-section-number">02</span>
+            <h2 id="service-heading">Service Information</h2>
+          </div>
+
+          <div class="request-field-grid">
+            <div class="request-field">
+              <label for="service-category"
+                >Service Category <span aria-hidden="true">*</span></label
+              >
+              <select id="service-category" name="serviceCategory" required>
+                <option value="" selected disabled>Select a service</option>
+                <option>Computer Repair &amp; Maintenance</option>
+                <option>Printer Setup &amp; Support</option>
+                <option>Networking Solutions</option>
+                <option>Hardware &amp; Accessories</option>
+                <option>Website Development</option>
+                <option>IT Support &amp; Consultation</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div class="request-field">
+              <label for="device-type"
+                >Device Type <span aria-hidden="true">*</span></label
+              >
+              <select id="device-type" name="deviceType" required>
+                <option value="" selected disabled>Select a device type</option>
+                <option>Desktop Computer</option>
+                <option>Laptop</option>
+                <option>Printer</option>
+                <option>Router</option>
+                <option>Network Equipment</option>
+                <option>Website</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div class="request-field">
+              <label for="device-model"
+                >Device Brand and Model
+                <span class="request-optional">Optional</span></label
+              >
+              <input
+                type="text"
+                id="device-model"
+                name="deviceModel"
+                placeholder="e.g. Dell Inspiron 15"
+              />
+            </div>
+
+            <div class="request-field">
+              <label for="serial-number"
+                >Serial Number
+                <span class="request-optional">Optional</span></label
+              >
+              <input
+                type="text"
+                id="serial-number"
+                name="serialNumber"
+                placeholder="Enter the serial number if available"
+              />
+            </div>
+
+            <div class="request-field request-field-wide">
+              <label for="description"
+                >Problem Description or Requested Service
+                <span aria-hidden="true">*</span></label
+              >
+              <textarea
+                id="description"
+                name="description"
+                rows="5"
+                maxlength="2000"
+                placeholder="Describe the issue or the service you need. Include any useful details."
+                required
+              ></textarea>
+            </div>
+
+            <div class="request-field">
+              <label for="preferred-date"
+                >Preferred Service Date
+                <span class="request-optional">Optional</span></label
+              >
+              <input type="date" id="preferred-date" name="preferredDate" />
+            </div>
+
+            <div class="request-field">
+              <label for="service-method"
+                >Service Method <span aria-hidden="true">*</span></label
+              >
+              <select id="service-method" name="serviceMethod" required>
+                <option value="" selected disabled>
+                  Select a service method
+                </option>
+                <option>Bring-in Service</option>
+                <option>On-site Service</option>
+                <option>Remote Support</option>
+              </select>
+            </div>
+
+            <div
+              class="request-field request-field-wide"
+              id="address-field"
+              hidden
+            >
+              <label for="address"
+                >Address or Location <span aria-hidden="true">*</span></label
+              >
+              <input
+                type="text"
+                id="address"
+                name="address"
+                autocomplete="street-address"
+                placeholder="Enter the service location"
+                disabled
+              />
+              <small
+                >Required for on-site service so we know where to go.</small
+              >
+            </div>
+          </div>
+        </section>
+
+        <section class="request-section" aria-labelledby="additional-heading">
+          <div class="request-section-heading">
+            <span class="request-section-number">03</span>
+            <h2 id="additional-heading">Additional Information</h2>
+          </div>
+
+          <div class="request-field-grid">
+            <div class="request-field">
+              <label for="budget"
+                >Optional Budget
+                <span class="request-optional">Optional</span></label
+              >
+              <input
+                type="text"
+                id="budget"
+                name="budget"
+                inputmode="decimal"
+                placeholder="e.g. 5,000 or flexible"
+              />
+            </div>
+
+            <div class="request-field request-field-wide">
+              <label for="additional-notes"
+                >Additional Notes
+                <span class="request-optional">Optional</span></label
+              >
+              <textarea
+                id="additional-notes"
+                name="additionalNotes"
+                rows="4"
+                maxlength="2000"
+                placeholder="Share any other information that may help us."
+              ></textarea>
+            </div>
+          </div>
+        </section>
+
+        <div class="request-form-actions">
+          <button type="submit" class="btn">Submit Request</button>
+          <button type="reset" class="btn btn-secondary">Clear Form</button>
+        </div>
+        <p
+          id="request-status"
+          class="request-status"
+          role="status"
+          aria-live="polite"
+        ></p>
+      </form>
+    </main>
+
+    <footer>
+      <p>&copy; 2026 Tricore Digital Works. Three Minds, One Solution.</p>
+    </footer>
+  </body>
+</html>

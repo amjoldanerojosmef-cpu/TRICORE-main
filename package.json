@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "@supabase/server": "^1.9.2",
+    "@supabase/supabase-js": "^2.117.3"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n PHP,BrowserSync \"php -S 127.0.0.1:8000 server.php\" \"browser-sync start --config bs-config.cjs\""
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.4",
+    "concurrently": "^10.0.6"
+  }
+}

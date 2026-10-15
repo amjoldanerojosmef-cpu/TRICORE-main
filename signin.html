@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Customer sign-in for Tricore Digital Works."
+    />
+    <title>Sign In | Tricore Digital Works</title>
+    <link rel="stylesheet" href="indexStyle.css" />
+    <script src="login.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <nav class="navbar">
+        <h2>TRICORE DIGITAL WORKS</h2>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="products.html">Products</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li>
+            <a href="signin.html" class="active" aria-current="page">Sign In</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="login-main">
+      <section class="login-panel" aria-labelledby="login-heading">
+        <p class="eyebrow">CUSTOMER ACCESS</p>
+        <h1 id="login-heading">Sign in to <span>Tricore.</span></h1>
+        <p class="login-intro">
+          Use your customer account to continue to Tricore Digital Works.
+        </p>
+
+        <form class="login-form" id="login-form">
+          <div class="login-field">
+            <label for="login-email"
+              >Email Address <span aria-hidden="true">*</span></label
+            >
+            <input
+              id="login-email"
+              name="email"
+              type="email"
+              autocomplete="username"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+
+          <div class="login-field">
+            <label for="login-password"
+              >Password <span aria-hidden="true">*</span></label
+            >
+            <input
+              id="login-password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+
+          <button class="btn" type="submit">Sign In</button>
+          <p
+            class="login-status"
+            id="login-status"
+            role="status"
+            aria-live="polite"
+            hidden
+          ></p>
+        </form>
+
+        <p class="login-service-link">
+          Need technical help instead?
+          <a href="ServiceRequest.html">Request a Service</a>
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2026 Tricore Digital Works. Three Minds, One Solution.</p>
+    </footer>
+  </body>
+</html>
