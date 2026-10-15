@@ -1584,6 +1584,18 @@ footer p {
   display: none;
 }
 
+.contact-form-status-success {
+  color: #c7f5eb;
+  background: #10211e;
+  border: 1px solid #327765;
+}
+
+.contact-form-status-error {
+  color: #ffd1d1;
+  background: #241515;
+  border: 1px solid #8c4444;
+}
+
 .contact-cta {
   padding: 62px 24px;
   text-align: center;

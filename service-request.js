@@ -17,13 +17,24 @@ function updateAddressField() {
   }
 }
 
-// Replace this adapter with a real receiving service when one is configured.
 async function submitServiceRequest(requestData) {
-  return {
-    sent: false,
-    message:
-      "Your details passed validation, but this website is not connected to receive requests. Nothing was sent or saved. Please contact us directly for now.",
-  };
+  const response = await fetch("/api/service-request", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(requestData),
+  });
+  let result;
+  try {
+    result = await response.json();
+  } catch {
+    throw new Error("The server returned an invalid response. Please try again later.");
+  }
+
+  if (!response.ok) {
+    throw new Error(result.error || "We could not submit your request.");
+  }
+
+  return result;
 }
 
 serviceMethod.addEventListener("change", updateAddressField);
@@ -44,19 +55,19 @@ requestForm.addEventListener("submit", async (event) => {
   }
 
   submitButton.disabled = true;
-  requestStatus.textContent = "Checking your request...";
+  requestStatus.textContent = "Submitting your request...";
   requestStatus.className = "request-status";
 
   try {
     const requestData = Object.fromEntries(new FormData(requestForm).entries());
-    const result = await submitServiceRequest(requestData);
+    await submitServiceRequest(requestData);
 
-    requestStatus.textContent = result.sent
-      ? "Thank you. Your service request has been submitted."
-      : result.message;
-    requestStatus.classList.add(
-      result.sent ? "request-status-success" : "request-status-warning",
-    );
+    requestForm.reset();
+    window.setTimeout(() => {
+      requestStatus.textContent =
+        "Thank you. Your service request has been submitted.";
+      requestStatus.className = "request-status request-status-success";
+    }, 0);
   } catch (error) {
     requestStatus.textContent =
       error.message || "We could not process the request. Please try again.";
