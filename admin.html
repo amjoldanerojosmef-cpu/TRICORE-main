@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Administrator dashboard for Tricore Digital Works submissions."
+    />
+    <title>Admin Dashboard | Tricore Digital Works</title>
+    <link rel="stylesheet" href="indexStyle.css" />
+    <script src="admin.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <nav class="navbar">
+        <h2>TRICORE DIGITAL WORKS</h2>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><button id="admin-logout" class="admin-logout" type="button">Sign Out</button></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="admin-main">
+      <section class="admin-heading">
+        <p class="eyebrow">ADMINISTRATOR</p>
+        <h1>Submission <span>Dashboard</span></h1>
+        <p>Review service requests and contact messages submitted through the website.</p>
+      </section>
+
+      <section class="admin-section" aria-labelledby="requests-heading">
+        <div class="admin-section-heading">
+          <h2 id="requests-heading">Service Requests</h2>
+          <span id="requests-count" class="admin-count"></span>
+        </div>
+        <p id="requests-status" class="admin-status" role="status" aria-live="polite" hidden></p>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th scope="col">Received</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Contact</th>
+                <th scope="col">Service / Device</th>
+                <th scope="col">Request Details</th>
+                <th scope="col">Method / Location</th>
+                <th scope="col">Preferred Date</th>
+              </tr>
+            </thead>
+            <tbody id="requests-table"></tbody>
+          </table>
+        </div>
+        <button id="requests-more" class="btn btn-secondary admin-more" type="button" hidden>
+          Load More Requests
+        </button>
+      </section>
+
+      <section class="admin-section" aria-labelledby="messages-heading">
+        <div class="admin-section-heading">
+          <h2 id="messages-heading">Contact Messages</h2>
+          <span id="messages-count" class="admin-count"></span>
+        </div>
+        <p id="messages-status" class="admin-status" role="status" aria-live="polite" hidden></p>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th scope="col">Received</th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Subject</th>
+                <th scope="col">Message</th>
+              </tr>
+            </thead>
+            <tbody id="messages-table"></tbody>
+          </table>
+        </div>
+        <button id="messages-more" class="btn btn-secondary admin-more" type="button" hidden>
+          Load More Messages
+        </button>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2026 Tricore Digital Works. Three Minds, One Solution.</p>
+    </footer>
+  </body>
+</html>

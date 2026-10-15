@@ -11,7 +11,7 @@ loginForm.addEventListener("submit", async (event) => {
   submitButton.disabled = true;
 
   try {
-    const response = await fetch("/api/login", {
+    const response = await fetch("/api/admin/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -26,10 +26,11 @@ loginForm.addEventListener("submit", async (event) => {
     }
 
     loginPassword.value = "";
-    loginStatus.textContent = `Signed in as ${result.user.email}.`;
+    window.location.assign("/admin.html");
   } catch (error) {
     loginStatus.textContent =
       error.message || "Could not reach the sign-in server.";
+    loginStatus.classList.add("login-status-error");
   } finally {
     submitButton.disabled = false;
   }
@@ -37,5 +38,6 @@ loginForm.addEventListener("submit", async (event) => {
 
 loginForm.addEventListener("input", () => {
   loginStatus.textContent = "";
+  loginStatus.className = "login-status";
   loginStatus.hidden = true;
 });

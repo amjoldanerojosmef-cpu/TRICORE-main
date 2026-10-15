@@ -68,8 +68,8 @@ alter table public.contact_messages enable row level security;
 
 revoke all on public.service_requests from anon, authenticated;
 revoke all on public.contact_messages from anon, authenticated;
-grant insert on public.service_requests to service_role;
-grant insert on public.contact_messages to service_role;
+grant select, insert on public.service_requests to service_role;
+grant select, insert on public.contact_messages to service_role;
 ```
 
 The Vercel functions use the Supabase service-role key only on the server. The
@@ -82,9 +82,13 @@ In the Vercel project, open **Settings → Environment Variables** and add:
 - `SUPABASE_URL` — your Supabase project URL.
 - `SUPABASE_SERVICE_ROLE_KEY` — the project's service-role key from **Project
   Settings → API**.
+- `ADMIN_EMAIL` — the exact email address of the administrator's Supabase Auth
+  account.
 
-Add both values to the environments you use (Production, Preview, and/or
-Development), then redeploy. Never put the service-role key in a public
+Add all three values to the environments you use (Production, Preview, and/or
+Development), then redeploy. Add the administrator account under **Supabase →
+Authentication → Users** and make `ADMIN_EMAIL` match that account. Only that
+email can use the admin dashboard. Never put the service-role key in a public
 environment variable such as a `VITE_` or `NEXT_PUBLIC_` variable or in browser
 JavaScript.
 
@@ -96,6 +100,17 @@ in the Supabase table. Server-side validation rejects invalid input.
 
 The existing `npm run dev` command starts the PHP sign-in server and BrowserSync;
 it does not emulate Vercel functions. To test these APIs locally, use the Vercel
-CLI (`vercel dev`) with the same environment variables. The existing PHP
-`/api/login` endpoint is not part of these form APIs and still needs a
-Vercel-compatible migration if sign-in is required on the deployed site.
+CLI (`vercel dev`) with the same environment variables. Admin credentials are
+verified with Supabase Auth. The access token is kept in an HttpOnly cookie, and
+the server verifies the administrator account for every dashboard data request.
+The service-role key is used only by server-side functions to fetch protected
+submissions.
+
+The administrator can sign in at `/signin.html`; the dashboard is at
+`/admin.html`. Submissions are loaded in pages of 25. Make sure the `service_role`
+database role has `SELECT` permission on both tables:
+
+```sql
+grant select, insert on public.service_requests to service_role;
+grant select, insert on public.contact_messages to service_role;
+```

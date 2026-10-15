@@ -1767,6 +1767,12 @@ footer p {
   display: none;
 }
 
+.login-status-error {
+  color: #ffd1d1;
+  background: #241515;
+  border-color: #8c4444;
+}
+
 .login-service-link {
   margin: 24px 0 0;
   color: #aebbc3;
@@ -1790,6 +1796,148 @@ footer p {
 
   .login-panel {
     padding: 26px 20px;
+  }
+}
+
+/* =========================
+   ADMIN DASHBOARD
+========================= */
+
+.admin-main {
+  width: min(100% - 40px, 1440px);
+  margin: 0 auto;
+  padding: 58px 0 72px;
+}
+
+.admin-heading {
+  margin-bottom: 36px;
+}
+
+.admin-heading h1 {
+  margin: 0 0 12px;
+  color: #ffffff;
+  font-size: clamp(32px, 5vw, 48px);
+}
+
+.admin-heading h1 span {
+  color: #00d9f5;
+}
+
+.admin-heading > p:last-child {
+  color: #b8c4cc;
+}
+
+.admin-section {
+  margin-top: 34px;
+  padding: 22px;
+  background: #0b1013;
+  border: 1px solid #20343b;
+  border-radius: 6px;
+}
+
+.admin-section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.admin-section-heading h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 22px;
+}
+
+.admin-count {
+  color: #aebbc3;
+  font-size: 13px;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #e5e7eb;
+  font-size: 14px;
+}
+
+.admin-table th,
+.admin-table td {
+  min-width: 120px;
+  padding: 13px 12px;
+  border-bottom: 1px solid #20343b;
+  text-align: left;
+  vertical-align: top;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.admin-table th {
+  color: #00d9f5;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-table td:nth-child(1) {
+  min-width: 155px;
+  color: #b8c4cc;
+}
+
+.admin-more {
+  margin-top: 18px;
+}
+
+.admin-more[hidden] {
+  display: none;
+}
+
+.admin-status {
+  margin: 18px 0;
+  padding: 13px 14px;
+  color: #f5e4b8;
+  background: #211d12;
+  border: 1px solid #756231;
+  border-radius: 4px;
+}
+
+.admin-status[hidden] {
+  display: none;
+}
+
+.admin-status-error {
+  color: #ffd1d1;
+  background: #241515;
+  border-color: #8c4444;
+}
+
+.admin-logout {
+  padding: 8px 12px;
+  color: #e5e7eb;
+  background: transparent;
+  border: 1px solid #34474f;
+  border-radius: 4px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.admin-logout:hover {
+  color: #00d9f5;
+  border-color: #00d9f5;
+}
+
+@media (max-width: 600px) {
+  .admin-main {
+    width: min(100% - 28px, 1440px);
+    padding: 38px 0 48px;
+  }
+
+  .admin-section {
+    padding: 16px 12px;
   }
 }
 
