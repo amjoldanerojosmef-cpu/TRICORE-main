@@ -25,6 +25,16 @@ const pages = {
   },
 };
 
+const productPage = {
+  type: "products",
+  offset: 0,
+  total: 0,
+  items: new Map(),
+  rows: document.querySelector("#admin-products-table"),
+  count: document.querySelector("#products-heading").parentElement.querySelector(".admin-count"),
+  status: document.querySelector("#products-admin-status"),
+  focusTarget: document.querySelector("#add-product"),
+};
 const editDialog = document.querySelector("#edit-dialog");
 const editForm = document.querySelector("#edit-form");
 const editFields = document.querySelector("#edit-fields");
@@ -33,8 +43,15 @@ const deleteDialog = document.querySelector("#delete-dialog");
 const deleteDescription = document.querySelector("#delete-description");
 const deleteStatus = document.querySelector("#delete-status");
 const deleteConfirm = document.querySelector("#delete-confirm");
+const productDialog = document.querySelector("#product-dialog");
+const productForm = document.querySelector("#product-form");
+const productFormStatus = document.querySelector("#product-form-status");
+const productImageInput = document.querySelector("#product-image");
+const productImagePreview = document.querySelector("#product-image-preview");
 let editing = null;
 let deleting = null;
+let editingProduct = null;
+let previewUrl = null;
 
 const FIELD_CONFIG = {
   service_requests: [
@@ -147,7 +164,9 @@ function renderItem(page, item) {
 }
 
 function updateCount(page) {
-  page.count.textContent = `${page.offset} of ${page.total}`;
+  if (page.count) {
+    page.count.textContent = `${page.offset} of ${page.total}`;
+  }
 }
 
 async function loadPage(page, reset = false) {
@@ -259,8 +278,12 @@ function openEditor(page, item) {
 }
 
 async function sendMutation(page, item, method, body) {
+  const url =
+    page.type === "products"
+      ? `/api/products/${encodeURIComponent(item.id)}`
+      : `/api/admin/submissions/${encodeURIComponent(item.id)}?type=${encodeURIComponent(page.type)}`;
   const response = await fetch(
-    `/api/admin/submissions/${encodeURIComponent(item.id)}?type=${encodeURIComponent(page.type)}`,
+    url,
     {
       method,
       headers: body ? { "Content-Type": "application/json" } : undefined,
@@ -281,10 +304,14 @@ async function sendMutation(page, item, method, body) {
 function openDeleteConfirmation(page, item, row, trigger) {
   deleting = { page, item, row, trigger };
   const label =
-    page.type === "service_requests" ? "service request" : "contact message";
+    page.type === "service_requests"
+      ? "service request"
+      : page.type === "contact_messages"
+        ? "contact message"
+        : "product";
   const subject = item.full_name || item.name || item.subject;
   deleteDescription.textContent = subject
-    ? `Permanently delete the ${label} from ${subject}? This action cannot be undone.`
+    ? `Permanently delete ${label === "product" ? "" : "the "}${label}${label === "product" ? ` “${subject}”` : ` from ${subject}`}? This action cannot be undone.`
     : `Permanently delete this ${label}? This action cannot be undone.`;
   deleteStatus.hidden = true;
   deleteStatus.textContent = "";
@@ -356,6 +383,213 @@ for (const page of Object.values(pages)) {
 
 }
 
+function renderAdminProduct(product) {
+  productPage.items.set(product.id, product);
+  const row = document.createElement("tr");
+  row.dataset.id = product.id;
+
+  const imageCell = document.createElement("td");
+  if (product.image_url) {
+    const image = document.createElement("img");
+    image.className = "admin-product-thumbnail";
+    image.src = product.image_url;
+    image.alt = "";
+    image.loading = "lazy";
+    imageCell.append(image);
+  } else {
+    imageCell.textContent = "—";
+  }
+  row.append(imageCell);
+  addCell(row, product.name);
+  addCell(row, product.category);
+  addCell(row, new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+  }).format(Number(product.price)));
+
+  const actions = document.createElement("td");
+  addButton(actions, "Edit", "edit", product);
+  addButton(actions, "Delete", "delete", product);
+  row.append(actions);
+  return row;
+}
+
+async function loadAdminProducts() {
+  productPage.status.hidden = false;
+  productPage.status.textContent = "Loading products...";
+  productPage.status.className = "admin-status";
+  try {
+    const response = await fetch("/api/products");
+    const result = await readJson(response);
+    if (!response.ok) {
+      throw new Error(result.error || "Could not load products.");
+    }
+    productPage.items.clear();
+    productPage.rows.replaceChildren(...result.products.map(renderAdminProduct));
+    productPage.offset = result.products.length;
+    productPage.total = result.products.length;
+    updateCount(productPage);
+    productPage.status.textContent = "No products yet. Add your first product.";
+    productPage.status.hidden = result.products.length > 0;
+  } catch (error) {
+    productPage.status.hidden = false;
+    productPage.status.textContent =
+      error.message || "Could not load products. Please try again.";
+    productPage.status.className = "admin-status admin-status-error";
+  }
+}
+
+function clearImagePreview() {
+  if (previewUrl) {
+    URL.revokeObjectURL(previewUrl);
+    previewUrl = null;
+  }
+  productImagePreview.removeAttribute("src");
+  productImagePreview.hidden = true;
+}
+
+function openProductEditor(product = null) {
+  editingProduct = product;
+  productForm.reset();
+  clearImagePreview();
+  productForm.elements.name.value = product?.name || "";
+  productForm.elements.category.value = product?.category || "";
+  productForm.elements.price.value = product?.price ?? "";
+  productForm.elements.description.value = product?.description || "";
+  productForm.elements.image_path.value = product?.image_path || "";
+  productForm.elements.image.required = false;
+  if (product?.image_url) {
+    productImagePreview.src = product.image_url;
+    productImagePreview.hidden = false;
+  }
+  document.querySelector("#product-dialog-title").textContent =
+    product ? "Edit Product" : "Add Product";
+  productFormStatus.hidden = true;
+  productDialog.showModal();
+}
+
+async function uploadProductImage(file) {
+  const signedResponse = await fetch("/api/admin/product-image-upload", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ contentType: file.type, size: file.size }),
+  });
+  const signedResult = await readJson(signedResponse);
+  if (!signedResponse.ok) {
+    throw new Error(signedResult.error || "Could not prepare the image upload.");
+  }
+
+  const uploadResponse = await fetch(signedResult.uploadUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": file.type,
+      "cache-control": "max-age=3600",
+      "x-upsert": "false",
+    },
+    body: file,
+  });
+  if (!uploadResponse.ok) {
+    throw new Error("Could not upload the product image. Please try again.");
+  }
+  return signedResult.imagePath;
+}
+
+productPage.rows.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-action]");
+  if (!button) {
+    return;
+  }
+  const row = button.closest("tr");
+  const product = productPage.items.get(row.dataset.id);
+  if (!product) {
+    return;
+  }
+  if (button.dataset.action === "edit") {
+    openProductEditor(product);
+  } else if (button.dataset.action === "delete") {
+    openDeleteConfirmation(productPage, product, row, button);
+  }
+});
+
+document.querySelector("#add-product").addEventListener("click", () => {
+  openProductEditor();
+});
+
+productImageInput.addEventListener("change", () => {
+  clearImagePreview();
+  const file = productImageInput.files[0];
+  if (file) {
+    previewUrl = URL.createObjectURL(file);
+    productImagePreview.src = previewUrl;
+    productImagePreview.hidden = false;
+  } else if (editingProduct?.image_url) {
+    productImagePreview.src = editingProduct.image_url;
+    productImagePreview.hidden = false;
+  }
+});
+
+productForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const saveButton = productForm.querySelector('button[type="submit"]');
+  saveButton.disabled = true;
+  productFormStatus.hidden = false;
+  productFormStatus.textContent = "Saving product...";
+  productFormStatus.className = "admin-status";
+
+  try {
+    const fields = new FormData(productForm);
+    const file = productImageInput.files[0];
+    let imagePath = fields.get("image_path") || null;
+    if (file) {
+      productFormStatus.textContent = "Uploading product photo...";
+      imagePath = await uploadProductImage(file);
+    }
+
+    const product = {
+      name: fields.get("name"),
+      category: fields.get("category"),
+      price: fields.get("price"),
+      description: fields.get("description"),
+      image_path: imagePath,
+    };
+    const isEditing = Boolean(editingProduct);
+    const response = await fetch(
+      isEditing ? `/api/products/${encodeURIComponent(editingProduct.id)}` : "/api/products",
+      {
+        method: isEditing ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(product),
+      },
+    );
+    const result = await readJson(response);
+    if (response.status === 401) {
+      window.location.replace("/signin.html");
+      return;
+    }
+    if (!response.ok) {
+      throw new Error(result.error || "Could not save product.");
+    }
+
+    await loadAdminProducts();
+    productDialog.close();
+  } catch (error) {
+    productFormStatus.textContent =
+      error.message || "Could not save product. Please try again.";
+    productFormStatus.className = "admin-status admin-status-error";
+  } finally {
+    saveButton.disabled = false;
+  }
+});
+
+function closeProductDialog() {
+  productDialog.close();
+  editingProduct = null;
+  clearImagePreview();
+}
+
+document.querySelector("#product-close").addEventListener("click", closeProductDialog);
+document.querySelector("#product-cancel").addEventListener("click", closeProductDialog);
+
 deleteConfirm.addEventListener("click", async () => {
   if (!deleting) {
     return;
@@ -377,6 +611,9 @@ deleteConfirm.addEventListener("click", async () => {
     deletion.page.status.textContent = "Submission deleted.";
     deletion.page.status.className = "admin-status admin-status-success";
     deletion.page.status.hidden = false;
+    if (deletion.page.type === "products") {
+      await loadAdminProducts();
+    }
     deleteDialog.close();
   } catch (error) {
     deleteStatus.textContent = error.message;
@@ -392,7 +629,7 @@ deleteDialog.addEventListener("close", () => {
   if (deletion?.trigger.isConnected) {
     deletion.trigger.focus();
   } else if (deletion) {
-    deletion.page.search.focus();
+    (deletion.page.search || deletion.page.focusTarget).focus();
   }
 });
 
@@ -460,3 +697,4 @@ document.querySelector("#admin-logout").addEventListener("click", async (event) 
 });
 
 Promise.all([loadPage(pages.requests), loadPage(pages.messages)]);
+loadAdminProducts();

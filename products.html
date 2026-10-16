@@ -9,6 +9,7 @@
     />
     <title>Products | Tricore Digital Works</title>
     <link rel="stylesheet" href="indexStyle.css" />
+    <script src="products.js" defer></script>
   </head>
   <body>
     <header>
@@ -44,13 +45,15 @@
         aria-label="Product categories"
       >
         <p class="products-notice" role="note">
-          Product photos and brand names are examples, not a live stock list.
-          We can help source parts and accessories that fit the services we
-          offer. Please confirm availability, pricing, and compatibility
-          before ordering.
+          Browse products offered by Tricore Digital Works. Contact us to check
+          availability or ask a question about a product.
         </p>
 
-        <div class="cards products-grid">
+        <p id="products-status" class="products-notice" role="status" aria-live="polite">
+          Loading products...
+        </p>
+        <div class="cards products-grid" id="product-list"></div>
+        <div class="cards products-grid products-legacy" aria-hidden="true">
           <article class="card product-card">
             <img
               class="product-photo"

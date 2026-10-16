@@ -65,17 +65,52 @@ create table if not exists public.contact_messages (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.products (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  category text,
+  description text not null,
+  price numeric(10, 2) not null check (price >= 0),
+  image_path text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 alter table public.service_requests enable row level security;
 alter table public.contact_messages enable row level security;
+alter table public.products enable row level security;
 
 revoke all on public.service_requests from anon, authenticated;
 revoke all on public.contact_messages from anon, authenticated;
+revoke all on public.products from anon, authenticated;
 grant select, insert, update, delete on public.service_requests to service_role;
 grant select, insert, update, delete on public.contact_messages to service_role;
+grant select, insert, update, delete on public.products to service_role;
+
+insert into storage.buckets (
+  id,
+  name,
+  public,
+  file_size_limit,
+  allowed_mime_types
+)
+values (
+  'product-images',
+  'product-images',
+  true,
+  5242880,
+  array['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+)
+on conflict (id) do update set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
 ```
 
 The Vercel functions use the Supabase service-role key only on the server. The
-browser never receives it, and anonymous users have no direct table access.
+browser never receives it, and anonymous users have no direct database table
+access. Product images are served from a public Supabase Storage bucket; image
+uploads and deletes are created by authenticated server endpoints.
 
 ## 2. Configure Vercel
 
@@ -109,14 +144,17 @@ The service-role key is used only by server-side functions to fetch protected
 submissions.
 
 The administrator can sign in at `/signin.html`; the dashboard is at
-`/admin.html`. The dashboard searches both tables and supports editing and
-deleting either submission type. Service requests have Low, Normal, High, and
-Urgent priority values. Submissions are loaded in pages of 25. Ensure the
+`/admin.html`. The dashboard manages products, searches submissions, and
+supports editing and deleting them. Product images are uploaded to Supabase
+Storage. Products display publicly on `/products.html` with a PHP price and an
+email inquiry link. Service requests have Low, Normal, High, and Urgent priority
+values. Submissions are loaded in pages of 25. Ensure the
 `service_role` database role has the following permissions:
 
 ```sql
 grant select, insert, update, delete on public.service_requests to service_role;
 grant select, insert, update, delete on public.contact_messages to service_role;
+grant select, insert, update, delete on public.products to service_role;
 ```
 
 If the tables already exist from an earlier setup, run this migration once to
