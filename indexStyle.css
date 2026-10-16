@@ -1991,6 +1991,9 @@ footer p {
 }
 
 .admin-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
   width: min(720px, calc(100% - 28px));
   max-height: min(85vh, 900px);
   padding: 24px;
