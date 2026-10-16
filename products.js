@@ -1,6 +1,8 @@
 const productList = document.querySelector("#product-list");
 const productStatus = document.querySelector("#products-status");
+const productSearch = document.querySelector("#products-search");
 const legacyProducts = document.querySelector(".products-legacy");
+let products = [];
 const productCurrency = new Intl.NumberFormat("en-PH", {
   style: "currency",
   currency: "PHP",
@@ -62,9 +64,8 @@ async function loadProducts() {
       throw new Error(result.error || "Could not load products.");
     }
 
-    productList.replaceChildren(...result.products.map(renderProduct));
-    productStatus.textContent = "No products are available right now.";
-    productStatus.hidden = result.products.length > 0;
+    products = result.products;
+    renderProducts();
   } catch (error) {
     productStatus.hidden = false;
     productStatus.className = "products-notice products-notice-error";
@@ -72,5 +73,27 @@ async function loadProducts() {
       error.message || "Could not load products. Please try again later.";
   }
 }
+
+function renderProducts() {
+  const query = productSearch.value.trim().toLocaleLowerCase();
+  const filteredProducts = products.filter((product) =>
+    [product.name, product.category, product.description]
+      .filter(Boolean)
+      .some((value) => value.toLocaleLowerCase().includes(query)),
+  );
+
+  productList.replaceChildren(...filteredProducts.map(renderProduct));
+  productStatus.className = "products-notice";
+  if (filteredProducts.length > 0) {
+    productStatus.hidden = true;
+  } else {
+    productStatus.hidden = false;
+    productStatus.textContent = query
+      ? "No products match your search."
+      : "No products are available right now.";
+  }
+}
+
+productSearch.addEventListener("input", renderProducts);
 
 loadProducts();
