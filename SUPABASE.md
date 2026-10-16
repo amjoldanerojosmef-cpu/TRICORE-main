@@ -25,6 +25,8 @@ create table if not exists public.service_requests (
   address text,
   budget text,
   additional_notes text,
+  priority text not null default 'normal'
+    check (priority in ('low', 'normal', 'high', 'urgent')),
   created_at timestamptz not null default now(),
   constraint service_requests_category_check check (service_category in (
     'Computer Repair & Maintenance',
@@ -68,8 +70,8 @@ alter table public.contact_messages enable row level security;
 
 revoke all on public.service_requests from anon, authenticated;
 revoke all on public.contact_messages from anon, authenticated;
-grant select, insert on public.service_requests to service_role;
-grant select, insert on public.contact_messages to service_role;
+grant select, insert, update, delete on public.service_requests to service_role;
+grant select, insert, update, delete on public.contact_messages to service_role;
 ```
 
 The Vercel functions use the Supabase service-role key only on the server. The
@@ -107,10 +109,38 @@ The service-role key is used only by server-side functions to fetch protected
 submissions.
 
 The administrator can sign in at `/signin.html`; the dashboard is at
-`/admin.html`. Submissions are loaded in pages of 25. Make sure the `service_role`
-database role has `SELECT` permission on both tables:
+`/admin.html`. The dashboard searches both tables and supports editing and
+deleting either submission type. Service requests have Low, Normal, High, and
+Urgent priority values. Submissions are loaded in pages of 25. Ensure the
+`service_role` database role has the following permissions:
 
 ```sql
-grant select, insert on public.service_requests to service_role;
-grant select, insert on public.contact_messages to service_role;
+grant select, insert, update, delete on public.service_requests to service_role;
+grant select, insert, update, delete on public.contact_messages to service_role;
+```
+
+If the tables already exist from an earlier setup, run this migration once to
+add the priority field:
+
+```sql
+alter table public.service_requests
+  add column if not exists priority text not null default 'normal';
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'service_requests_priority_check'
+      and conrelid = 'public.service_requests'::regclass
+  ) then
+    alter table public.service_requests
+      add constraint service_requests_priority_check
+      check (priority in ('low', 'normal', 'high', 'urgent'));
+  end if;
+end
+$$;
+
+grant select, insert, update, delete on public.service_requests to service_role;
+grant select, insert, update, delete on public.contact_messages to service_role;
 ```

@@ -1854,6 +1854,35 @@ footer p {
   font-size: 13px;
 }
 
+.admin-search-label {
+  display: block;
+  margin: 0 0 7px;
+  color: #b8c4cc;
+  font-size: 13px;
+}
+
+.admin-search {
+  width: min(100%, 520px);
+  min-height: 42px;
+  margin-bottom: 18px;
+  padding: 10px 12px;
+  color: #ffffff;
+  background: #05090b;
+  border: 1px solid #34474f;
+  border-radius: 4px;
+  font: inherit;
+}
+
+.admin-search:focus-visible,
+.admin-priority:focus-visible,
+.admin-edit-field input:focus-visible,
+.admin-edit-field select:focus-visible,
+.admin-edit-field textarea:focus-visible {
+  outline: 2px solid #00d9f5;
+  outline-offset: 2px;
+  border-color: #00d9f5;
+}
+
 .admin-table-wrap {
   overflow-x: auto;
 }
@@ -1888,6 +1917,46 @@ footer p {
   color: #b8c4cc;
 }
 
+.admin-priority,
+.admin-edit-field input,
+.admin-edit-field select,
+.admin-edit-field textarea {
+  min-height: 40px;
+  padding: 8px 10px;
+  color: #ffffff;
+  background: #05090b;
+  border: 1px solid #34474f;
+  border-radius: 4px;
+  font: inherit;
+}
+
+.admin-priority {
+  min-width: 105px;
+}
+
+.admin-action {
+  display: block;
+  margin: 0 0 7px;
+  padding: 7px 10px;
+  color: #00d9f5;
+  background: transparent;
+  border: 1px solid #34474f;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.admin-action:hover {
+  border-color: #00d9f5;
+}
+
+.admin-action[data-action="delete"] {
+  color: #ffd1d1;
+}
+
+.admin-action[data-action="delete"]:hover {
+  border-color: #8c4444;
+}
+
 .admin-more {
   margin-top: 18px;
 }
@@ -1915,6 +1984,78 @@ footer p {
   border-color: #8c4444;
 }
 
+.admin-status-success {
+  color: #c7f5eb;
+  background: #10211e;
+  border-color: #327765;
+}
+
+.admin-dialog {
+  width: min(720px, calc(100% - 28px));
+  max-height: min(85vh, 900px);
+  padding: 24px;
+  color: #e5e7eb;
+  background: #0b1013;
+  border: 1px solid #327765;
+  border-radius: 6px;
+}
+
+.admin-dialog::backdrop {
+  background: rgb(0 0 0 / 75%);
+}
+
+.admin-dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.admin-dialog-heading h2 {
+  margin: 0;
+  color: #ffffff;
+}
+
+.admin-dialog-close {
+  color: #e5e7eb;
+  background: transparent;
+  border: 0;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.admin-edit-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-edit-field {
+  display: grid;
+  gap: 7px;
+  color: #b8c4cc;
+  font-size: 13px;
+}
+
+.admin-edit-field:has(textarea),
+.admin-edit-field:has(select[name="service_category"]),
+.admin-edit-field:has(select[name="device_type"]),
+.admin-edit-field:has(select[name="service_method"]) {
+  grid-column: 1 / -1;
+}
+
+.admin-edit-field textarea {
+  resize: vertical;
+}
+
+.admin-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
 .admin-logout {
   padding: 8px 12px;
   color: #e5e7eb;
@@ -1938,6 +2079,23 @@ footer p {
 
   .admin-section {
     padding: 16px 12px;
+  }
+
+  .admin-edit-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-edit-field:has(textarea),
+  .admin-edit-field:has(select) {
+    grid-column: auto;
+  }
+
+  .admin-dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .admin-dialog-actions button {
+    width: 100%;
   }
 }
 

@@ -2,6 +2,28 @@ const { authenticateAdmin, supabaseClient } = require("../../lib/admin-auth");
 
 const PAGE_SIZE = 25;
 const TABLES = new Set(["service_requests", "contact_messages"]);
+const SEARCH_COLUMNS = {
+  service_requests: [
+    "full_name",
+    "contact_number",
+    "email",
+    "service_category",
+    "device_type",
+    "device_model",
+    "serial_number",
+    "description",
+    "service_method",
+    "address",
+    "budget",
+    "additional_notes",
+    "priority",
+  ],
+  contact_messages: ["name", "email", "subject", "message"],
+};
+
+function escapePostgrestText(value) {
+  return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "private, no-store");
@@ -17,23 +39,40 @@ module.exports = async function handler(req, res) {
 
   const table = req.query?.type;
   const offsetValue = req.query?.offset ?? "0";
+  const searchValue = req.query?.search ?? "";
   const offset = Number(offsetValue);
   if (
     typeof table !== "string" ||
     !TABLES.has(table) ||
     !/^\d+$/.test(String(offsetValue)) ||
     !Number.isSafeInteger(offset) ||
-    offset < 0
+    offset < 0 ||
+    typeof searchValue !== "string" ||
+    searchValue.length > 100
   ) {
     return res.status(400).json({ error: "Invalid submissions page request." });
   }
 
   try {
-    const { data, error, count } = await supabaseClient()
+    let query = supabaseClient()
       .from(table)
       .select("*", { count: "exact" })
-      .order("created_at", { ascending: false })
-      .range(offset, offset + PAGE_SIZE - 1);
+      .order("created_at", { ascending: false });
+
+    const search = searchValue.trim();
+    if (search) {
+      const escapedSearch = escapePostgrestText(search);
+      query = query.or(
+        SEARCH_COLUMNS[table]
+          .map((column) => `${column}.ilike."%${escapedSearch}%"`)
+          .join(","),
+      );
+    }
+
+    const { data, error, count } = await query.range(
+      offset,
+      offset + PAGE_SIZE - 1,
+    );
 
     if (error) {
       console.error(`Could not read ${table} for admin:`, error.message);

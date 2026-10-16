@@ -34,6 +34,8 @@
           <h2 id="requests-heading">Service Requests</h2>
           <span id="requests-count" class="admin-count"></span>
         </div>
+        <label class="admin-search-label" for="requests-search">Search requests</label>
+        <input id="requests-search" class="admin-search" type="search" maxlength="100" placeholder="Search customer, service, device, or details" />
         <p id="requests-status" class="admin-status" role="status" aria-live="polite" hidden></p>
         <div class="admin-table-wrap">
           <table class="admin-table">
@@ -46,6 +48,8 @@
                 <th scope="col">Request Details</th>
                 <th scope="col">Method / Location</th>
                 <th scope="col">Preferred Date</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Actions</th>
               </tr>
             </thead>
             <tbody id="requests-table"></tbody>
@@ -61,6 +65,8 @@
           <h2 id="messages-heading">Contact Messages</h2>
           <span id="messages-count" class="admin-count"></span>
         </div>
+        <label class="admin-search-label" for="messages-search">Search messages</label>
+        <input id="messages-search" class="admin-search" type="search" maxlength="100" placeholder="Search name, email, subject, or message" />
         <p id="messages-status" class="admin-status" role="status" aria-live="polite" hidden></p>
         <div class="admin-table-wrap">
           <table class="admin-table">
@@ -71,6 +77,7 @@
                 <th scope="col">Email</th>
                 <th scope="col">Subject</th>
                 <th scope="col">Message</th>
+                <th scope="col">Actions</th>
               </tr>
             </thead>
             <tbody id="messages-table"></tbody>
@@ -81,6 +88,21 @@
         </button>
       </section>
     </main>
+
+    <dialog id="edit-dialog" class="admin-dialog">
+      <form id="edit-form">
+        <div class="admin-dialog-heading">
+          <h2 id="edit-heading">Edit Submission</h2>
+          <button id="edit-close" class="admin-dialog-close" type="button" aria-label="Close edit dialog">×</button>
+        </div>
+        <div id="edit-fields" class="admin-edit-fields"></div>
+        <p id="edit-status" class="admin-status" role="status" aria-live="polite" hidden></p>
+        <div class="admin-dialog-actions">
+          <button class="btn btn-secondary" id="edit-cancel" type="button">Cancel</button>
+          <button class="btn" type="submit">Save Changes</button>
+        </div>
+      </form>
+    </dialog>
 
     <footer>
       <p>&copy; 2026 Tricore Digital Works. Three Minds, One Solution.</p>
