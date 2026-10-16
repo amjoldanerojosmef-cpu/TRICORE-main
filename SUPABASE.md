@@ -143,6 +143,10 @@ on conflict (id) do update set
   allowed_mime_types = excluded.allowed_mime_types;
 ```
 
+For existing catalogs, this setup adds the category table and seeds it from
+category names already stored on products. Renaming a category updates its
+products; deleting a category leaves those products in place with no category.
+
 The Vercel functions use the Supabase service-role key only on the server. The
 browser never receives it, and anonymous users have no direct database table
 access. Product images are served from a public Supabase Storage bucket; image
