@@ -104,6 +104,28 @@
       </form>
     </dialog>
 
+    <dialog
+      id="delete-dialog"
+      class="admin-dialog admin-delete-dialog"
+      aria-labelledby="delete-heading"
+      aria-describedby="delete-description"
+    >
+      <div class="admin-delete-icon" aria-hidden="true">!</div>
+      <h2 id="delete-heading">Delete this submission?</h2>
+      <p id="delete-description">
+        This permanently deletes the submission. This action cannot be undone.
+      </p>
+      <p id="delete-status" class="admin-status admin-status-error" role="alert" hidden></p>
+      <div class="admin-dialog-actions">
+        <button class="btn btn-secondary" id="delete-cancel" type="button">
+          Cancel
+        </button>
+        <button class="btn admin-delete-confirm" id="delete-confirm" type="button">
+          Delete Permanently
+        </button>
+      </div>
+    </dialog>
+
     <footer>
       <p>&copy; 2026 Tricore Digital Works. Three Minds, One Solution.</p>
     </footer>

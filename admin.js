@@ -29,7 +29,12 @@ const editDialog = document.querySelector("#edit-dialog");
 const editForm = document.querySelector("#edit-form");
 const editFields = document.querySelector("#edit-fields");
 const editStatus = document.querySelector("#edit-status");
+const deleteDialog = document.querySelector("#delete-dialog");
+const deleteDescription = document.querySelector("#delete-description");
+const deleteStatus = document.querySelector("#delete-status");
+const deleteConfirm = document.querySelector("#delete-confirm");
 let editing = null;
+let deleting = null;
 
 const FIELD_CONFIG = {
   service_requests: [
@@ -273,6 +278,20 @@ async function sendMutation(page, item, method, body) {
   return result;
 }
 
+function openDeleteConfirmation(page, item, row, trigger) {
+  deleting = { page, item, row, trigger };
+  const label =
+    page.type === "service_requests" ? "service request" : "contact message";
+  const subject = item.full_name || item.name || item.subject;
+  deleteDescription.textContent = subject
+    ? `Permanently delete the ${label} from ${subject}? This action cannot be undone.`
+    : `Permanently delete this ${label}? This action cannot be undone.`;
+  deleteStatus.hidden = true;
+  deleteStatus.textContent = "";
+  deleteConfirm.disabled = false;
+  deleteDialog.showModal();
+}
+
 pages.requests.more.addEventListener("click", () => loadPage(pages.requests));
 pages.messages.more.addEventListener("click", () => loadPage(pages.messages));
 
@@ -299,26 +318,8 @@ for (const page of Object.values(pages)) {
       return;
     }
 
-    if (
-      button.dataset.action === "delete" &&
-      window.confirm(`Delete this ${page.type === "service_requests" ? "service request" : "contact message"} permanently?`)
-    ) {
-      button.disabled = true;
-      try {
-        await sendMutation(page, item, "DELETE");
-        row.remove();
-        page.offset = Math.max(0, page.offset - 1);
-        page.total -= 1;
-        updateCount(page);
-        page.status.textContent = "Submission deleted.";
-        page.status.className = "admin-status admin-status-success";
-        page.status.hidden = false;
-      } catch (error) {
-        page.status.textContent = error.message;
-        page.status.className = "admin-status admin-status-error";
-        page.status.hidden = false;
-        button.disabled = false;
-      }
+    if (button.dataset.action === "delete") {
+      openDeleteConfirmation(page, item, row, button);
     }
   });
 
@@ -354,6 +355,56 @@ for (const page of Object.values(pages)) {
   });
 
 }
+
+deleteConfirm.addEventListener("click", async () => {
+  if (!deleting) {
+    return;
+  }
+
+  const deletion = deleting;
+  deleteConfirm.disabled = true;
+  deleteStatus.hidden = false;
+  deleteStatus.textContent = "Deleting submission...";
+  deleteStatus.className = "admin-status";
+
+  try {
+    await sendMutation(deletion.page, deletion.item, "DELETE");
+    deletion.row.remove();
+    deletion.page.items.delete(deletion.item.id);
+    deletion.page.offset = Math.max(0, deletion.page.offset - 1);
+    deletion.page.total -= 1;
+    updateCount(deletion.page);
+    deletion.page.status.textContent = "Submission deleted.";
+    deletion.page.status.className = "admin-status admin-status-success";
+    deletion.page.status.hidden = false;
+    deleteDialog.close();
+  } catch (error) {
+    deleteStatus.textContent = error.message;
+    deleteStatus.className = "admin-status admin-status-error";
+  } finally {
+    deleteConfirm.disabled = false;
+  }
+});
+
+deleteDialog.addEventListener("close", () => {
+  const deletion = deleting;
+  deleting = null;
+  if (deletion?.trigger.isConnected) {
+    deletion.trigger.focus();
+  } else if (deletion) {
+    deletion.page.search.focus();
+  }
+});
+
+deleteDialog.addEventListener("cancel", (event) => {
+  if (deleteConfirm.disabled) {
+    event.preventDefault();
+  }
+});
+
+document.querySelector("#delete-cancel").addEventListener("click", () => {
+  deleteDialog.close();
+});
 
 editForm.addEventListener("submit", async (event) => {
   event.preventDefault();
