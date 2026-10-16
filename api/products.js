@@ -8,7 +8,16 @@ const {
 
 module.exports = async function handler(req, res) {
   if (req.method === "GET") {
-    res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
+    const isAdmin = req.query?.admin === "1";
+    if (isAdmin && !(await requireAdmin(req, res))) {
+      return;
+    }
+    res.setHeader(
+      "Cache-Control",
+      isAdmin
+        ? "private, no-store"
+        : "public, s-maxage=60, stale-while-revalidate=300",
+    );
     try {
       const { data, error } = await supabaseClient()
         .from(PRODUCT_TABLE)
@@ -48,6 +57,20 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    if (validation.product.category) {
+      const { data: category, error: categoryError } = await supabaseClient()
+        .from("product_categories")
+        .select("name")
+        .eq("name", validation.product.category)
+        .maybeSingle();
+      if (categoryError || !category) {
+        if (categoryError) {
+          console.error("Could not verify product category:", categoryError.message);
+        }
+        return res.status(400).json({ error: "Select an existing product category." });
+      }
+    }
+
     const { data, error } = await supabaseClient()
       .from(PRODUCT_TABLE)
       .insert(validation.product)

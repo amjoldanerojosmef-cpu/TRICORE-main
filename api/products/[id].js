@@ -60,6 +60,20 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: validation.error });
     }
 
+    if (validation.product.category) {
+      const { data: category, error: categoryError } = await client
+        .from("product_categories")
+        .select("name")
+        .eq("name", validation.product.category)
+        .maybeSingle();
+      if (categoryError || !category) {
+        if (categoryError) {
+          console.error("Could not verify product category:", categoryError.message);
+        }
+        return res.status(400).json({ error: "Select an existing product category." });
+      }
+    }
+
     const { data: previous, error: readError } = await client
       .from(PRODUCT_TABLE)
       .select("image_path")

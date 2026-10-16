@@ -33,6 +33,7 @@
         <div class="admin-section-heading">
           <h2 id="products-heading">Products</h2>
           <span class="admin-count"></span>
+          <button id="manage-categories" class="btn btn-secondary" type="button">Manage Categories</button>
           <button id="add-product" class="btn" type="button">Add Product</button>
         </div>
         <p id="products-admin-status" class="admin-status" role="status" aria-live="polite" hidden></p>
@@ -140,7 +141,9 @@
           </label>
           <label class="admin-edit-field">
             Category
-            <input name="category" type="text" maxlength="80" />
+            <select name="category">
+              <option value="">No category</option>
+            </select>
           </label>
           <label class="admin-edit-field">
             Price (PHP)
@@ -161,6 +164,46 @@
         <div class="admin-dialog-actions">
           <button class="btn btn-secondary" id="product-cancel" type="button">Cancel</button>
           <button class="btn" type="submit">Save Product</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="categories-dialog" class="admin-dialog" aria-labelledby="categories-dialog-title">
+      <div class="admin-dialog-heading">
+        <h2 id="categories-dialog-title">Manage Categories</h2>
+        <button id="categories-close" class="admin-dialog-close" type="button" aria-label="Close category manager">×</button>
+      </div>
+      <p id="categories-status" class="admin-status" role="status" aria-live="polite" hidden></p>
+      <div class="admin-dialog-actions admin-category-add">
+        <button id="add-category" class="btn" type="button">Add Category</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th scope="col">Category</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="categories-table"></tbody>
+        </table>
+      </div>
+    </dialog>
+
+    <dialog id="category-form-dialog" class="admin-dialog admin-category-dialog" aria-labelledby="category-form-title">
+      <form id="category-form">
+        <div class="admin-dialog-heading">
+          <h2 id="category-form-title">Add Category</h2>
+          <button id="category-form-close" class="admin-dialog-close" type="button" aria-label="Close category form">×</button>
+        </div>
+        <label class="admin-edit-field" for="category-name">
+          Category name
+          <input id="category-name" name="name" type="text" maxlength="80" required />
+        </label>
+        <p id="category-form-status" class="admin-status" role="status" aria-live="polite" hidden></p>
+        <div class="admin-dialog-actions">
+          <button id="category-form-cancel" class="btn btn-secondary" type="button">Cancel</button>
+          <button class="btn" type="submit">Save Category</button>
         </div>
       </form>
     </dialog>

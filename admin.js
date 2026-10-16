@@ -35,6 +35,16 @@ const productPage = {
   status: document.querySelector("#products-admin-status"),
   focusTarget: document.querySelector("#add-product"),
 };
+const categoryPage = {
+  type: "categories",
+  offset: 0,
+  total: 0,
+  items: new Map(),
+  rows: document.querySelector("#categories-table"),
+  count: null,
+  status: document.querySelector("#categories-status"),
+  focusTarget: document.querySelector("#manage-categories"),
+};
 const editDialog = document.querySelector("#edit-dialog");
 const editForm = document.querySelector("#edit-form");
 const editFields = document.querySelector("#edit-fields");
@@ -48,10 +58,18 @@ const productForm = document.querySelector("#product-form");
 const productFormStatus = document.querySelector("#product-form-status");
 const productImageInput = document.querySelector("#product-image");
 const productImagePreview = document.querySelector("#product-image-preview");
+const categoriesDialog = document.querySelector("#categories-dialog");
+const categoryFormDialog = document.querySelector("#category-form-dialog");
+const categoryForm = document.querySelector("#category-form");
+const categoryNameInput = document.querySelector("#category-name");
+const categoryFormStatus = document.querySelector("#category-form-status");
+const productCategorySelect = productForm.elements.category;
 let editing = null;
 let deleting = null;
 let editingProduct = null;
+let editingCategory = null;
 let previewUrl = null;
+let categories = [];
 
 const FIELD_CONFIG = {
   service_requests: [
@@ -278,9 +296,10 @@ function openEditor(page, item) {
 }
 
 async function sendMutation(page, item, method, body) {
-  const url =
-    page.type === "products"
-      ? `/api/products/${encodeURIComponent(item.id)}`
+  const url = page.type === "products"
+    ? `/api/products/${encodeURIComponent(item.id)}`
+    : page.type === "categories"
+      ? `/api/categories/${encodeURIComponent(item.name)}`
       : `/api/admin/submissions/${encodeURIComponent(item.id)}?type=${encodeURIComponent(page.type)}`;
   const response = await fetch(
     url,
@@ -308,8 +327,12 @@ function openDeleteConfirmation(page, item, row, trigger) {
       ? "service request"
       : page.type === "contact_messages"
         ? "contact message"
-        : "product";
-  const subject = item.full_name || item.name || item.subject;
+        : page.type === "categories"
+          ? "category"
+          : "product";
+  const subject = page.type === "categories"
+    ? item.name
+    : item.full_name || item.name || item.subject;
   deleteDescription.textContent = subject
     ? `Permanently delete ${label === "product" ? "" : "the "}${label}${label === "product" ? ` “${subject}”` : ` from ${subject}`}? This action cannot be undone.`
     : `Permanently delete this ${label}? This action cannot be undone.`;
@@ -419,7 +442,7 @@ async function loadAdminProducts() {
   productPage.status.textContent = "Loading products...";
   productPage.status.className = "admin-status";
   try {
-    const response = await fetch("/api/products");
+    const response = await fetch("/api/products?admin=1");
     const result = await readJson(response);
     if (!response.ok) {
       throw new Error(result.error || "Could not load products.");
@@ -439,6 +462,65 @@ async function loadAdminProducts() {
   }
 }
 
+async function loadCategories() {
+  categoryPage.status.hidden = false;
+  categoryPage.status.textContent = "Loading categories...";
+  categoryPage.status.className = "admin-status";
+  try {
+    const response = await fetch("/api/categories?admin=1");
+    const result = await readJson(response);
+    if (!response.ok) {
+      throw new Error(result.error || "Could not load categories.");
+    }
+
+    categories = result.categories;
+    categoryPage.items.clear();
+    categoryPage.rows.replaceChildren(
+      ...categories.map((name) => {
+        const item = { name };
+        categoryPage.items.set(name, item);
+        const row = document.createElement("tr");
+        row.dataset.id = name;
+        addCell(row, name);
+        const actions = document.createElement("td");
+        addButton(actions, "Edit", "edit", item);
+        addButton(actions, "Delete", "delete", item);
+        row.append(actions);
+        return row;
+      }),
+    );
+    categoryPage.total = categories.length;
+    categoryPage.status.textContent =
+      "No categories yet. Add a category before creating products.";
+    categoryPage.status.hidden = categories.length > 0;
+    populateProductCategories();
+  } catch (error) {
+    categoryPage.status.hidden = false;
+    categoryPage.status.textContent =
+      error.message || "Could not load categories. Please try again.";
+    categoryPage.status.className = "admin-status admin-status-error";
+  }
+}
+
+function populateProductCategories(selected = productCategorySelect.value) {
+  productCategorySelect.replaceChildren(new Option("No category", ""));
+  for (const category of categories) {
+    productCategorySelect.add(new Option(category, category));
+  }
+  productCategorySelect.value = categories.includes(selected) ? selected : "";
+}
+
+function openCategoryForm(category = null) {
+  editingCategory = category;
+  categoryForm.reset();
+  categoryNameInput.value = category?.name || "";
+  document.querySelector("#category-form-title").textContent =
+    category ? "Edit Category" : "Add Category";
+  categoryFormStatus.hidden = true;
+  categoryFormDialog.showModal();
+  categoryNameInput.focus();
+}
+
 function clearImagePreview() {
   if (previewUrl) {
     URL.revokeObjectURL(previewUrl);
@@ -452,8 +534,8 @@ function openProductEditor(product = null) {
   editingProduct = product;
   productForm.reset();
   clearImagePreview();
+  populateProductCategories(product?.category || "");
   productForm.elements.name.value = product?.name || "";
-  productForm.elements.category.value = product?.category || "";
   productForm.elements.price.value = product?.price ?? "";
   productForm.elements.description.value = product?.description || "";
   productForm.elements.image_path.value = product?.image_path || "";
@@ -511,8 +593,86 @@ productPage.rows.addEventListener("click", (event) => {
   }
 });
 
+categoryPage.rows.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-action]");
+  if (!button) {
+    return;
+  }
+  const row = button.closest("tr");
+  const category = categoryPage.items.get(row.dataset.id);
+  if (!category) {
+    return;
+  }
+  if (button.dataset.action === "edit") {
+    openCategoryForm(category);
+  } else if (button.dataset.action === "delete") {
+    openDeleteConfirmation(categoryPage, category, row, button);
+  }
+});
+
 document.querySelector("#add-product").addEventListener("click", () => {
   openProductEditor();
+});
+
+document.querySelector("#manage-categories").addEventListener("click", async () => {
+  categoriesDialog.showModal();
+  await loadCategories();
+});
+
+document.querySelector("#categories-close").addEventListener("click", () => {
+  categoriesDialog.close();
+});
+
+document.querySelector("#add-category").addEventListener("click", () => {
+  openCategoryForm();
+});
+
+document.querySelector("#category-form-close").addEventListener("click", () => {
+  categoryFormDialog.close();
+});
+
+document.querySelector("#category-form-cancel").addEventListener("click", () => {
+  categoryFormDialog.close();
+});
+
+categoryForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const saveButton = categoryForm.querySelector('button[type="submit"]');
+  saveButton.disabled = true;
+  categoryFormStatus.hidden = false;
+  categoryFormStatus.textContent = "Saving category...";
+  categoryFormStatus.className = "admin-status";
+
+  try {
+    const name = categoryNameInput.value.trim();
+    const response = await fetch(
+      editingCategory
+        ? `/api/categories/${encodeURIComponent(editingCategory.name)}`
+        : "/api/categories",
+      {
+        method: editingCategory ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      },
+    );
+    const result = await readJson(response);
+    if (response.status === 401) {
+      window.location.replace("/signin.html");
+      return;
+    }
+    if (!response.ok) {
+      throw new Error(result.error || "Could not save category.");
+    }
+    categoryFormDialog.close();
+    await loadCategories();
+    await loadAdminProducts();
+  } catch (error) {
+    categoryFormStatus.textContent =
+      error.message || "Could not save category. Please try again.";
+    categoryFormStatus.className = "admin-status admin-status-error";
+  } finally {
+    saveButton.disabled = false;
+  }
 });
 
 productImageInput.addEventListener("change", () => {
@@ -613,6 +773,9 @@ deleteConfirm.addEventListener("click", async () => {
     deletion.page.status.hidden = false;
     if (deletion.page.type === "products") {
       await loadAdminProducts();
+    } else if (deletion.page.type === "categories") {
+      await loadCategories();
+      await loadAdminProducts();
     }
     deleteDialog.close();
   } catch (error) {
@@ -698,3 +861,4 @@ document.querySelector("#admin-logout").addEventListener("click", async (event) 
 
 Promise.all([loadPage(pages.requests), loadPage(pages.messages)]);
 loadAdminProducts();
+loadCategories();

@@ -65,10 +65,19 @@ create table if not exists public.contact_messages (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.product_categories (
+  name text primary key check (length(trim(name)) between 1 and 80),
+  created_at timestamptz not null default now()
+);
+
+create unique index if not exists product_categories_name_case_insensitive
+  on public.product_categories (lower(name));
+
 create table if not exists public.products (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  category text,
+  category text references public.product_categories(name)
+    on update cascade on delete set null,
   description text not null,
   price numeric(10, 2) not null check (price >= 0),
   image_path text,
@@ -76,16 +85,43 @@ create table if not exists public.products (
   updated_at timestamptz not null default now()
 );
 
+insert into public.product_categories (name)
+select distinct trim(category)
+from public.products
+where category is not null and trim(category) <> ''
+on conflict do nothing;
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'products_category_fkey'
+      and conrelid = 'public.products'::regclass
+  ) then
+    alter table public.products
+      add constraint products_category_fkey
+      foreign key (category)
+      references public.product_categories(name)
+      on update cascade
+      on delete set null;
+  end if;
+end
+$$;
+
 alter table public.service_requests enable row level security;
 alter table public.contact_messages enable row level security;
 alter table public.products enable row level security;
+alter table public.product_categories enable row level security;
 
 revoke all on public.service_requests from anon, authenticated;
 revoke all on public.contact_messages from anon, authenticated;
 revoke all on public.products from anon, authenticated;
+revoke all on public.product_categories from anon, authenticated;
 grant select, insert, update, delete on public.service_requests to service_role;
 grant select, insert, update, delete on public.contact_messages to service_role;
 grant select, insert, update, delete on public.products to service_role;
+grant select, insert, update, delete on public.product_categories to service_role;
 
 insert into storage.buckets (
   id,
@@ -155,6 +191,7 @@ values. Submissions are loaded in pages of 25. Ensure the
 grant select, insert, update, delete on public.service_requests to service_role;
 grant select, insert, update, delete on public.contact_messages to service_role;
 grant select, insert, update, delete on public.products to service_role;
+grant select, insert, update, delete on public.product_categories to service_role;
 ```
 
 If the tables already exist from an earlier setup, run this migration once to
