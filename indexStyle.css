@@ -1940,6 +1940,34 @@ footer p {
   min-width: 105px;
 }
 
+.admin-priority-low,
+.admin-priority-option-low {
+  color: #a7f3be;
+  background-color: #153b27;
+  border-color: #3e9d5d;
+}
+
+.admin-priority-normal,
+.admin-priority-option-normal {
+  color: #a9e9f5;
+  background-color: #123440;
+  border-color: #3b91a4;
+}
+
+.admin-priority-high,
+.admin-priority-option-high {
+  color: #ffe19a;
+  background-color: #453512;
+  border-color: #c39838;
+}
+
+.admin-priority-urgent,
+.admin-priority-option-urgent {
+  color: #ffc0c5;
+  background-color: #481f24;
+  border-color: #c5535e;
+}
+
 .admin-action {
   display: block;
   margin: 0 0 7px;
@@ -2654,6 +2682,34 @@ html[data-theme="light"] :is(
   .login-field input::placeholder
 ) {
   color: #687980;
+}
+
+html[data-theme="light"] .admin-priority-low,
+html[data-theme="light"] .admin-priority-option-low {
+  color: #176332;
+  background-color: #e1f5e7;
+  border-color: #83c797;
+}
+
+html[data-theme="light"] .admin-priority-normal,
+html[data-theme="light"] .admin-priority-option-normal {
+  color: #155b6b;
+  background-color: #e0f3f7;
+  border-color: #80bfcb;
+}
+
+html[data-theme="light"] .admin-priority-high,
+html[data-theme="light"] .admin-priority-option-high {
+  color: #74520a;
+  background-color: #fff3d3;
+  border-color: #d9b75e;
+}
+
+html[data-theme="light"] .admin-priority-urgent,
+html[data-theme="light"] .admin-priority-option-urgent {
+  color: #8a2630;
+  background-color: #fde7e9;
+  border-color: #dc9299;
 }
 
 html[data-theme="light"] .admin-table {

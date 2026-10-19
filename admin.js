@@ -138,6 +138,16 @@ function formatDate(value) {
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
 }
 
+function setPriorityColor(select, priority) {
+  select.classList.remove(
+    "admin-priority-low",
+    "admin-priority-normal",
+    "admin-priority-high",
+    "admin-priority-urgent",
+  );
+  select.classList.add(`admin-priority-${priority}`);
+}
+
 function renderItem(page, item) {
   page.items.set(item.id, item);
   const row = document.createElement("tr");
@@ -159,11 +169,13 @@ function renderItem(page, item) {
     for (const priority of ["low", "normal", "high", "urgent"]) {
       const option = document.createElement("option");
       option.value = priority;
+      option.className = `admin-priority-option-${priority}`;
       option.textContent = priority[0].toUpperCase() + priority.slice(1);
       option.selected = (item.priority || "normal") === priority;
       prioritySelect.append(option);
     }
     prioritySelect.dataset.previous = item.priority || "normal";
+    setPriorityColor(prioritySelect, item.priority || "normal");
     priorityCell.append(prioritySelect);
     row.append(priorityCell);
   } else {
@@ -385,17 +397,20 @@ for (const page of Object.values(pages)) {
     }
 
     select.disabled = true;
+    setPriorityColor(select, select.value);
     try {
       const result = await sendMutation(page, item, "PATCH", {
         priority: select.value,
       });
       page.items.set(item.id, result.item);
       select.dataset.previous = result.item.priority;
+      setPriorityColor(select, result.item.priority);
       page.status.textContent = "Priority updated.";
       page.status.className = "admin-status admin-status-success";
       page.status.hidden = false;
     } catch (error) {
       select.value = select.dataset.previous;
+      setPriorityColor(select, select.dataset.previous);
       page.status.textContent = error.message;
       page.status.className = "admin-status admin-status-error";
       page.status.hidden = false;
