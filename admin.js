@@ -64,40 +64,12 @@ const categoryForm = document.querySelector("#category-form");
 const categoryNameInput = document.querySelector("#category-name");
 const categoryFormStatus = document.querySelector("#category-form-status");
 const productCategorySelect = productForm.elements.category;
-const themeToggle = document.querySelector("#admin-theme-toggle");
 let editing = null;
 let deleting = null;
 let editingProduct = null;
 let editingCategory = null;
 let previewUrl = null;
 let categories = [];
-
-function applyAdminTheme(theme) {
-  const isLight = theme === "light";
-  document.body.dataset.theme = isLight ? "light" : "dark";
-  themeToggle.textContent = isLight ? "Use dark mode" : "Use light mode";
-  themeToggle.setAttribute(
-    "aria-label",
-    isLight ? "Switch to dark mode" : "Switch to light mode",
-  );
-}
-
-try {
-  applyAdminTheme(localStorage.getItem("admin-theme") === "light" ? "light" : "dark");
-} catch (error) {
-  console.error("Could not read the saved admin theme preference.", error);
-  applyAdminTheme("dark");
-}
-
-themeToggle.addEventListener("click", () => {
-  const theme = document.body.dataset.theme === "light" ? "dark" : "light";
-  applyAdminTheme(theme);
-  try {
-    localStorage.setItem("admin-theme", theme);
-  } catch (error) {
-    console.error("Could not save the admin theme preference.", error);
-  }
-});
 
 const FIELD_CONFIG = {
   service_requests: [
