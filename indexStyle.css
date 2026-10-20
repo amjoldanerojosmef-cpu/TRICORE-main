@@ -1942,30 +1942,30 @@ footer p {
 
 .admin-priority-low,
 .admin-priority-option-low {
-  color: #a7f3be;
-  background-color: #153b27;
-  border-color: #3e9d5d;
+  color: #ffffff;
+  background-color: #008000;
+  border-color: #008000;
 }
 
 .admin-priority-normal,
 .admin-priority-option-normal {
-  color: #b6d5ff;
-  background-color: #162f4a;
-  border-color: #5285c2;
+  color: #ffffff;
+  background-color: #0000ff;
+  border-color: #0000ff;
 }
 
 .admin-priority-high,
 .admin-priority-option-high {
-  color: #ffd0a3;
-  background-color: #4a2b14;
-  border-color: #d98535;
+  color: #000000;
+  background-color: #ffa500;
+  border-color: #ffa500;
 }
 
 .admin-priority-urgent,
 .admin-priority-option-urgent {
-  color: #ffc0c5;
-  background-color: #481f24;
-  border-color: #c5535e;
+  color: #000000;
+  background-color: #ff0000;
+  border-color: #ff0000;
 }
 
 .admin-action {
@@ -2686,30 +2686,30 @@ html[data-theme="light"] :is(
 
 html[data-theme="light"] select.admin-priority.admin-priority-low,
 html[data-theme="light"] .admin-priority-option-low {
-  color: #176332;
-  background-color: #e1f5e7;
-  border-color: #83c797;
+  color: #ffffff;
+  background-color: #008000;
+  border-color: #008000;
 }
 
 html[data-theme="light"] select.admin-priority.admin-priority-normal,
 html[data-theme="light"] .admin-priority-option-normal {
-  color: #184f9b;
-  background-color: #e5efff;
-  border-color: #8aaee5;
+  color: #ffffff;
+  background-color: #0000ff;
+  border-color: #0000ff;
 }
 
 html[data-theme="light"] select.admin-priority.admin-priority-high,
 html[data-theme="light"] .admin-priority-option-high {
-  color: #8a460a;
-  background-color: #fff0df;
-  border-color: #e4a35e;
+  color: #000000;
+  background-color: #ffa500;
+  border-color: #ffa500;
 }
 
 html[data-theme="light"] select.admin-priority.admin-priority-urgent,
 html[data-theme="light"] .admin-priority-option-urgent {
-  color: #8a2630;
-  background-color: #fde7e9;
-  border-color: #dc9299;
+  color: #000000;
+  background-color: #ff0000;
+  border-color: #ff0000;
 }
 
 html[data-theme="light"] .admin-table {
