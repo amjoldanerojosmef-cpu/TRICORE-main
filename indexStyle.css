@@ -1949,16 +1949,16 @@ footer p {
 
 .admin-priority-normal,
 .admin-priority-option-normal {
-  color: #a9e9f5;
-  background-color: #123440;
-  border-color: #3b91a4;
+  color: #b6d5ff;
+  background-color: #162f4a;
+  border-color: #5285c2;
 }
 
 .admin-priority-high,
 .admin-priority-option-high {
-  color: #ffe19a;
-  background-color: #453512;
-  border-color: #c39838;
+  color: #ffd0a3;
+  background-color: #4a2b14;
+  border-color: #d98535;
 }
 
 .admin-priority-urgent,
@@ -2693,16 +2693,16 @@ html[data-theme="light"] .admin-priority-option-low {
 
 html[data-theme="light"] select.admin-priority.admin-priority-normal,
 html[data-theme="light"] .admin-priority-option-normal {
-  color: #155b6b;
-  background-color: #e0f3f7;
-  border-color: #80bfcb;
+  color: #184f9b;
+  background-color: #e5efff;
+  border-color: #8aaee5;
 }
 
 html[data-theme="light"] select.admin-priority.admin-priority-high,
 html[data-theme="light"] .admin-priority-option-high {
-  color: #74520a;
-  background-color: #fff3d3;
-  border-color: #d9b75e;
+  color: #8a460a;
+  background-color: #fff0df;
+  border-color: #e4a35e;
 }
 
 html[data-theme="light"] select.admin-priority.admin-priority-urgent,
