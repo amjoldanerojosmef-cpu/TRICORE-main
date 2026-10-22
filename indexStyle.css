@@ -1867,6 +1867,26 @@ footer p {
   font-size: 13px;
 }
 
+.admin-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.admin-filter-row .admin-search {
+  margin-bottom: 0;
+}
+
+.admin-filter-field {
+  display: grid;
+  gap: 7px;
+  width: min(100%, 520px);
+  color: #b8c4cc;
+  font-size: 13px;
+}
+
 .admin-search {
   width: min(100%, 520px);
   min-height: 42px;
@@ -1879,7 +1899,18 @@ footer p {
   font: inherit;
 }
 
+.admin-filter {
+  min-height: 42px;
+  padding: 10px 12px;
+  color: #ffffff;
+  background: #05090b;
+  border: 1px solid #34474f;
+  border-radius: 4px;
+  font: inherit;
+}
+
 .admin-search:focus-visible,
+.admin-filter:focus-visible,
 .admin-priority:focus-visible,
 .admin-edit-field input:focus-visible,
 .admin-edit-field select:focus-visible,
@@ -2660,6 +2691,7 @@ html[data-theme="light"] :is(
   .contact-page-form textarea,
   .login-field input,
   .admin-search,
+  .admin-filter,
   .admin-priority,
   .admin-edit-field input,
   .admin-edit-field select,

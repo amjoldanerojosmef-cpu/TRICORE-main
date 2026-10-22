@@ -2,6 +2,7 @@ const { authenticateAdmin, supabaseClient } = require("../../lib/admin-auth");
 
 const PAGE_SIZE = 25;
 const TABLES = new Set(["service_requests", "contact_messages"]);
+const PRIORITIES = new Set(["low", "normal", "high", "urgent"]);
 const SEARCH_COLUMNS = {
   service_requests: [
     "full_name",
@@ -40,6 +41,7 @@ module.exports = async function handler(req, res) {
   const table = req.query?.type;
   const offsetValue = req.query?.offset ?? "0";
   const searchValue = req.query?.search ?? "";
+  const priorityValue = req.query?.priority ?? "";
   const offset = Number(offsetValue);
   if (
     typeof table !== "string" ||
@@ -48,7 +50,10 @@ module.exports = async function handler(req, res) {
     !Number.isSafeInteger(offset) ||
     offset < 0 ||
     typeof searchValue !== "string" ||
-    searchValue.length > 100
+    searchValue.length > 100 ||
+    typeof priorityValue !== "string" ||
+    (priorityValue !== "" &&
+      (table !== "service_requests" || !PRIORITIES.has(priorityValue)))
   ) {
     return res.status(400).json({ error: "Invalid submissions page request." });
   }
@@ -67,6 +72,9 @@ module.exports = async function handler(req, res) {
           .map((column) => `${column}.ilike."%${escapedSearch}%"`)
           .join(","),
       );
+    }
+    if (priorityValue) {
+      query = query.eq("priority", priorityValue);
     }
 
     const { data, error, count } = await query.range(

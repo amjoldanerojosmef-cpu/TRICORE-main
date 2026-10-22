@@ -9,6 +9,7 @@ const pages = {
     count: document.querySelector("#requests-count"),
     status: document.querySelector("#requests-status"),
     search: document.querySelector("#requests-search"),
+    priorityFilter: document.querySelector("#requests-priority-filter"),
     more: document.querySelector("#requests-more"),
   },
   messages: {
@@ -33,6 +34,8 @@ const productPage = {
   rows: document.querySelector("#admin-products-table"),
   count: document.querySelector("#products-heading").parentElement.querySelector(".admin-count"),
   status: document.querySelector("#products-admin-status"),
+  categoryFilter: document.querySelector("#products-category-filter"),
+  allItems: [],
   focusTarget: document.querySelector("#add-product"),
 };
 const categoryPage = {
@@ -219,6 +222,9 @@ async function loadPage(page, reset = false) {
       offset: String(page.offset),
       search: page.search.value.trim(),
     });
+    if (page.type === "service_requests" && page.priorityFilter.value) {
+      params.set("priority", page.priorityFilter.value);
+    }
     const response = await fetch(`/api/admin/submissions?${params}`);
     const result = await readJson(response);
 
@@ -356,6 +362,9 @@ function openDeleteConfirmation(page, item, row, trigger) {
 
 pages.requests.more.addEventListener("click", () => loadPage(pages.requests));
 pages.messages.more.addEventListener("click", () => loadPage(pages.messages));
+pages.requests.priorityFilter.addEventListener("change", () => {
+  loadPage(pages.requests, true);
+});
 
 for (const page of Object.values(pages)) {
   let debounceId;
@@ -405,6 +414,16 @@ for (const page of Object.values(pages)) {
       page.items.set(item.id, result.item);
       select.dataset.previous = result.item.priority;
       setPriorityColor(select, result.item.priority);
+      if (
+        page.priorityFilter.value &&
+        result.item.priority !== page.priorityFilter.value
+      ) {
+        row.remove();
+        page.items.delete(item.id);
+        page.offset = Math.max(0, page.offset - 1);
+        page.total = Math.max(0, page.total - 1);
+        updateCount(page);
+      }
       page.status.textContent = "Priority updated.";
       page.status.className = "admin-status admin-status-success";
       page.status.hidden = false;
@@ -452,6 +471,22 @@ function renderAdminProduct(product) {
   return row;
 }
 
+function renderFilteredAdminProducts() {
+  const category = productPage.categoryFilter.value;
+  const products = category
+    ? productPage.allItems.filter((product) => product.category === category)
+    : productPage.allItems;
+  productPage.items.clear();
+  productPage.rows.replaceChildren(...products.map(renderAdminProduct));
+  productPage.offset = products.length;
+  productPage.total = productPage.allItems.length;
+  updateCount(productPage);
+  productPage.status.textContent = productPage.allItems.length
+    ? "No products found in this category."
+    : "No products yet. Add your first product.";
+  productPage.status.hidden = products.length > 0;
+}
+
 async function loadAdminProducts() {
   productPage.status.hidden = false;
   productPage.status.textContent = "Loading products...";
@@ -462,13 +497,8 @@ async function loadAdminProducts() {
     if (!response.ok) {
       throw new Error(result.error || "Could not load products.");
     }
-    productPage.items.clear();
-    productPage.rows.replaceChildren(...result.products.map(renderAdminProduct));
-    productPage.offset = result.products.length;
-    productPage.total = result.products.length;
-    updateCount(productPage);
-    productPage.status.textContent = "No products yet. Add your first product.";
-    productPage.status.hidden = result.products.length > 0;
+    productPage.allItems = result.products;
+    renderFilteredAdminProducts();
   } catch (error) {
     productPage.status.hidden = false;
     productPage.status.textContent =
@@ -489,6 +519,14 @@ async function loadCategories() {
     }
 
     categories = result.categories;
+    const selectedCategory = productPage.categoryFilter.value;
+    productPage.categoryFilter.replaceChildren(new Option("All categories", ""));
+    for (const category of categories) {
+      productPage.categoryFilter.add(new Option(category, category));
+    }
+    productPage.categoryFilter.value = categories.includes(selectedCategory)
+      ? selectedCategory
+      : "";
     categoryPage.items.clear();
     categoryPage.rows.replaceChildren(
       ...categories.map((name) => {
@@ -628,6 +666,8 @@ categoryPage.rows.addEventListener("click", (event) => {
 document.querySelector("#add-product").addEventListener("click", () => {
   openProductEditor();
 });
+
+productPage.categoryFilter.addEventListener("change", renderFilteredAdminProducts);
 
 document.querySelector("#manage-categories").addEventListener("click", async () => {
   categoriesDialog.showModal();

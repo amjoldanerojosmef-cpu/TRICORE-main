@@ -38,6 +38,14 @@
           <button id="manage-categories" class="btn btn-secondary" type="button">Manage Categories</button>
           <button id="add-product" class="btn" type="button">Add Product</button>
         </div>
+        <div class="admin-filter-row">
+          <label class="admin-filter-field" for="products-category-filter">
+            Filter by category
+            <select id="products-category-filter" class="admin-filter">
+              <option value="">All categories</option>
+            </select>
+          </label>
+        </div>
         <p id="products-admin-status" class="admin-status" role="status" aria-live="polite" hidden></p>
         <div class="admin-table-wrap">
           <table class="admin-table">
@@ -60,8 +68,22 @@
           <h2 id="requests-heading">Service Requests</h2>
           <span id="requests-count" class="admin-count"></span>
         </div>
-        <label class="admin-search-label" for="requests-search">Search requests</label>
-        <input id="requests-search" class="admin-search" type="search" maxlength="100" placeholder="Search customer, service, device, or details" />
+        <div class="admin-filter-row">
+          <label class="admin-filter-field" for="requests-search">
+            Search requests
+            <input id="requests-search" class="admin-search" type="search" maxlength="100" placeholder="Search customer, service, device, or details" />
+          </label>
+          <label class="admin-filter-field" for="requests-priority-filter">
+            Filter by priority
+            <select id="requests-priority-filter" class="admin-filter">
+              <option value="">All priorities</option>
+              <option value="low">Low</option>
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </label>
+        </div>
         <p id="requests-status" class="admin-status" role="status" aria-live="polite" hidden></p>
         <div class="admin-table-wrap">
           <table class="admin-table">
